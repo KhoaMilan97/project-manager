@@ -99,6 +99,11 @@ export default createMuiTheme({
         borderColor: arcBlue,
       },
     },
+    // MuiDialog: {
+    //   paper: {
+    //     zIndex: 1303,
+    //   },
+    // },
     MuiSvgIcon: {
       root: {
         "&.MuiSelect-icon": {
