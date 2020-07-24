@@ -99,11 +99,19 @@ export default createMuiTheme({
         borderColor: arcBlue,
       },
     },
-    // MuiDialog: {
-    //   paper: {
-    //     zIndex: 1303,
-    //   },
-    // },
+    MuiTableSortLabel: {
+      root: {
+        "&:hover": {
+          color: arcOrange,
+        },
+        "&.MuiTableSortLabel-active": {
+          color: arcOrange,
+        },
+      },
+      icon: {
+        fill: arcOrange,
+      },
+    },
     MuiSvgIcon: {
       root: {
         "&.MuiSelect-icon": {

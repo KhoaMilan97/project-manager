@@ -33,6 +33,8 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Select from "@material-ui/core/Select";
 import Button from "@material-ui/core/Button";
 
+import EnhancedTable from "../src/ui/EnhancedTable";
+
 const useStyles = makeStyles((theme) => ({
   service: {
     fontWeight: 300,
@@ -59,7 +61,8 @@ const createData = (
   complexity,
   platforms,
   users,
-  total
+  total,
+  search
 ) => ({
   name,
   date,
@@ -69,6 +72,7 @@ const createData = (
   platforms,
   users,
   total,
+  search,
 });
 
 function ProjectManager() {
@@ -78,13 +82,14 @@ function ProjectManager() {
   const [rows, setRows] = useState([
     createData(
       "Zachary Reece",
-      "11/2/2019",
+      "11/02/2019",
       "Website",
       "E-Commerce",
       "N/A",
       "N/A",
       "N/A",
-      "$1500"
+      "$1500",
+      true
     ),
     createData(
       "Bill Gates",
@@ -94,17 +99,41 @@ function ProjectManager() {
       "Medium",
       "Web Application",
       "0-10",
-      "$1600"
+      "$1600",
+      true
     ),
     createData(
       "Steve Jobs",
-      "2/13/19",
+      "02/13/19",
       "Custom Software",
       "Photo/Video, File Transfer, Users/Authentication",
       "Low",
       "Web Application",
       "10-100",
-      "$1250"
+      "$1250",
+      true
+    ),
+    createData(
+      "Khoa Milan",
+      "02/13/19",
+      "Custom Software",
+      "Photo/Video, File Transfer, Users/Authentication",
+      "Low",
+      "Web Application",
+      "10-100",
+      "$1250",
+      true
+    ),
+    createData(
+      "Bailu",
+      "02/13/19",
+      "Custom Software",
+      "Photo/Video, File Transfer, Users/Authentication",
+      "Low",
+      "Web Application",
+      "10-100",
+      "$1250",
+      true
     ),
   ]);
 
@@ -134,6 +163,10 @@ function ProjectManager() {
   const [platforms, setPlatforms] = useState([]);
   const [features, setFeatures] = useState([]);
 
+  const [page, setPage] = React.useState(0);
+
+  const [searchValue, setSearchValue] = useState("");
+
   const addProject = () => {
     setRows([
       ...rows,
@@ -145,7 +178,8 @@ function ProjectManager() {
         service === "Website" ? "N/A" : complexity,
         service === "Website" ? "N/A" : platforms.join(","),
         service === "Website" ? "N/A" : users,
-        `$${total}`
+        `$${total}`,
+        true
       ),
     ]);
     setDialogOpen(false);
@@ -159,6 +193,29 @@ function ProjectManager() {
     setTotal("");
   };
 
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+
+    const rowData = rows.map((row) =>
+      Object.values(row).filter((option) => option !== true && option !== false)
+    );
+
+    const matches = rowData.map((row) =>
+      row.map((option) =>
+        option.toLowerCase().includes(event.target.value.toLowerCase())
+      )
+    );
+    const newRows = [...rows];
+    matches.map((row, index) =>
+      row.includes(true)
+        ? (newRows[index].search = true)
+        : (newRows[index].search = false)
+    );
+
+    setRows(newRows);
+    setPage(0);
+  };
+
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <Grid container direction="column">
@@ -168,6 +225,8 @@ function ProjectManager() {
         <Grid item>
           <TextFiled
             style={{ width: "35em", marginLeft: "5em" }}
+            value={searchValue}
+            onChange={handleSearch}
             InputProps={{
               endAdornment: (
                 <InputAdornment
@@ -233,44 +292,9 @@ function ProjectManager() {
             />
           </FormGroup>
         </Grid>
-        <Grid item container justify="flex-end" style={{ marginTop: "5em" }}>
-          <Grid item style={{ marginRight: 75 }}>
-            <FilterListIcon color="secondary" style={{ fontSize: 50 }} />
-          </Grid>
-        </Grid>
-        <Grid item style={{ marginBottom: "15em" }}>
-          <TableContainer component={Paper} elevation={0}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center">Name</TableCell>
-                  <TableCell align="center">Date</TableCell>
-                  <TableCell align="center">Services</TableCell>
-                  <TableCell align="center">Features</TableCell>
-                  <TableCell align="center">Complexity</TableCell>
-                  <TableCell align="center">Platforms</TableCell>
-                  <TableCell align="center">Users</TableCell>
-                  <TableCell align="center">Total</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, index) => (
-                  <TableRow key={`${row.name}+${index}`}>
-                    <TableCell align="center">{row.name}</TableCell>
-                    <TableCell align="center">{row.date}</TableCell>
-                    <TableCell align="center">{row.service}</TableCell>
-                    <TableCell align="center" style={{ maxWidth: "5em" }}>
-                      {row.features}
-                    </TableCell>
-                    <TableCell align="center">{row.complexity}</TableCell>
-                    <TableCell align="center">{row.platforms}</TableCell>
-                    <TableCell align="center">{row.users}</TableCell>
-                    <TableCell align="center">{row.total}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+
+        <Grid item style={{ marginTop: "5em", marginBottom: "15em" }}>
+          <EnhancedTable rows={rows} page={page} setPage={setPage} />
         </Grid>
         <Dialog
           // style={{ zIndex: 1302 }}
@@ -553,4 +577,4 @@ function ProjectManager() {
 }
 
 export default ProjectManager;
-//200
+//205
