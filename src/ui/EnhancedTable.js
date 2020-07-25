@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
@@ -16,10 +16,10 @@ import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
+import Snackbar from "@material-ui/core/Snackbar";
+import Button from "@material-ui/core/Button";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -144,7 +144,33 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { numSelected, selected, rows, setRows, setSelected } = props;
+  const [alert, setAlert] = useState({
+    open: false,
+    backgroundColor: "#FF3232",
+    message: "Row deleted!",
+  });
+  const [undo, setUndo] = useState([]);
+
+  const handleDelete = () => {
+    const newRows = [...rows];
+    const selectedRows = newRows.filter((row) => selected.includes(row.name));
+    selectedRows.map((row) => (row.search = false));
+
+    setSelected([]);
+    setRows(newRows);
+    setAlert({ ...alert, open: true });
+    setUndo(selectedRows);
+  };
+
+  const onUndo = () => {
+    setAlert({ ...alert, open: false });
+    const newRows = [...rows];
+    const newUndo = [...undo];
+    newUndo.map((row) => (row.search = true));
+    Array.prototype.push.apply(newRows, ...newUndo);
+    setRows(newRows);
+  };
 
   return (
     <Toolbar
@@ -174,7 +200,7 @@ const EnhancedTableToolbar = (props) => {
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton aria-label="delete">
+          <IconButton aria-label="delete" onClick={handleDelete}>
             <DeleteIcon color="secondary" style={{ fontSize: 30 }} />
           </IconButton>
         </Tooltip>
@@ -185,6 +211,25 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       )}
+      <Snackbar
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{ style: { backgroundColor: alert.backgroundColor } }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={(event, reason) => {
+          if (reason === "clickaway") {
+            setAlert({ ...alert, open: false });
+            const newRows = [...rows];
+            const names = [...undo.map((row) => row.name)];
+            setRows(newRows.filter((row) => !names.includes(row.name)));
+          }
+        }}
+        action={
+          <Button onClick={onUndo} style={{ color: "#fff" }}>
+            Undo
+          </Button>
+        }
+      />
     </Toolbar>
   );
 };
@@ -217,7 +262,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable({ rows, page, setPage }) {
+export default function EnhancedTable({ rows, setRows, page, setPage }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("name");
@@ -274,7 +319,13 @@ export default function EnhancedTable({ rows, page, setPage }) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper} elevation={0}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          selected={selected}
+          setSelected={setSelected}
+          rows={rows}
+          setRows={setRows}
+          numSelected={selected.length}
+        />
         <TableContainer>
           <Table
             className={classes.table}
