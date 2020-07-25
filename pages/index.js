@@ -116,10 +116,10 @@ function ProjectManager() {
     createData(
       "Khoa Milan",
       "02/13/19",
-      "Custom Software",
+      "Mobile App",
       "Photo/Video, File Transfer, Users/Authentication",
       "Low",
-      "Web Application",
+      "iOS, Android",
       "10-100",
       "$1250",
       true
@@ -127,10 +127,10 @@ function ProjectManager() {
     createData(
       "Bailu",
       "02/13/19",
-      "Custom Software",
+      "Mobile App",
       "Photo/Video, File Transfer, Users/Authentication",
       "Low",
-      "Web Application",
+      "Android",
       "10-100",
       "$1250",
       true
@@ -299,6 +299,10 @@ function ProjectManager() {
             setRows={setRows}
             page={page}
             setPage={setPage}
+            websiteChecked={websiteChecked}
+            iOSChecked={iOSChecked}
+            androidChecked={androidChecked}
+            softwareChecked={softwareChecked}
           />
         </Grid>
         <Dialog
@@ -582,4 +586,4 @@ function ProjectManager() {
 }
 
 export default ProjectManager;
-//205
+//209

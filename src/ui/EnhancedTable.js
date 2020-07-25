@@ -262,8 +262,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable({ rows, setRows, page, setPage }) {
+export default function EnhancedTable(props) {
   const classes = useStyles();
+  const {
+    rows,
+    setRows,
+    page,
+    setPage,
+    websiteChecked,
+    iOSChecked,
+    androidChecked,
+    softwareChecked,
+  } = props;
+
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("name");
   const [selected, setSelected] = React.useState([]);
@@ -316,6 +327,38 @@ export default function EnhancedTable({ rows, setRows, page, setPage }) {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
+  const switchFilters = () => {
+    const websites = rows.filter((row) =>
+      websiteChecked ? row.service === "Website" : null
+    );
+    const iOSApps = rows.filter((row) =>
+      iOSChecked ? row.platforms.includes("iOS") : null
+    );
+    const androidApps = rows.filter((row) =>
+      androidChecked ? row.platforms.includes("Android") : null
+    );
+
+    const softwareApps = rows.filter((row) =>
+      softwareChecked ? row.service === "Custom Software" : null
+    );
+
+    if (!websiteChecked && !iOSChecked && !androidChecked && !softwareChecked) {
+      return rows;
+    } else {
+      let newRows = websites.concat(
+        iOSApps.filter((item) => websites.indexOf(item) < 0)
+      );
+      let newRows2 = newRows.concat(
+        androidApps.filter((item) => newRows.indexOf(item) < 0)
+      );
+      let newRows3 = newRows2.concat(
+        softwareApps.filter((item) => newRows2.indexOf(item) < 0)
+      );
+
+      return newRows3;
+    }
+  };
+
   return (
     <div className={classes.root}>
       <Paper className={classes.paper} elevation={0}>
@@ -344,7 +387,7 @@ export default function EnhancedTable({ rows, setRows, page, setPage }) {
             />
             <TableBody>
               {stableSort(
-                rows.filter((row) => row.search),
+                switchFilters().filter((row) => row.search),
                 getComparator(order, orderBy)
               )
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
