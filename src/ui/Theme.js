@@ -148,5 +148,10 @@ export default createMuiTheme({
         },
       },
     },
+    MuiPickersModal: {
+      dialogRoot: {
+        zIndex: 1303,
+      },
+    },
   },
 });
